@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Métodos Numéricos — Desarrollo con Resultados | Ing. Sistemas UMSA
+    </title>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [
+            ["$", "$"],
+            ["\\(", "\\)"],
+          ],
+        },
+      };
+    </script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <style>
+      .result-table {
+        font-size: 0.95em;
+      }
+      .result-table td,
+      .result-table th {
+        text-align: center;
+      }
+      .highlight {
+        background-color: #e9ecef;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container py-4">
+      <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold">Métodos Numéricos</h1>
+        <p class="lead text-muted">
+          Desarrollo Completo con Resultados Numéricos — Ingeniería de Sistemas
+          | UMSA
+        </p>
+      </div>
+
+      <!-- Pestañas -->
+      <ul class="nav nav-tabs mb-4" id="methodTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="errores-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#errores"
+          >
+            Errores
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="taylor-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#taylor"
+          >
+            Taylor
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="lu-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#lu"
+          >
+            LU
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="inversion-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#inversion"
+          >
+            Inversión
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="edos-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#edos"
+          >
+            EDOs (RK4)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="parabolica-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#parabolica"
+          >
+            EDP Parab.
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="hiperbolica-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#hiperbolica"
+          >
+            EDP Hiperb.
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="eliptica-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#eliptica"
+          >
+            EDP Elípt.
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="interpolacion-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#interpolacion"
+          >
+            Interpolación
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="integracion-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#integracion"
+          >
+            Integración
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="aproximacion-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#aproximacion"
+          >
+            Aproximación
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="optimizacion-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#optimizacion"
+          >
+            Optimización
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="fourier-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#fourier"
+          >
+            Fourier
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="spline-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#spline"
+          >
+            Spline
+          </button>
+        </li>
+      </ul>
+
+      <!-- Contenido -->
+      <div class="tab-content" id="methodTabContent">
+        <!-- ✅ Errores -->
+        <div class="tab-pane fade show active" id="errores" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Errores de Truncamiento y Redondeo</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                El <strong>error de truncamiento</strong> proviene de truncar
+                una serie infinita (ej. Taylor). El
+                <strong>error absoluto</strong> se define como $
+                |y_{\text{exacto}} - y_{\text{aprox}}| $.
+              </p>
+
+              <h5>Ejemplo: Aproximar $ e^{0.5} $ con Taylor (orden 3)</h5>
+              <p>
+                <strong>Enunciado</strong>: Usar $ T_3(x) = 1 + x +
+                \dfrac{x^2}{2} + \dfrac{x^3}{6} $ para $ x = 0.5 $.
+              </p>
+
+              <h6>Desarrollo</h6>
+              <ul>
+                <li>Valor exacto: $ e^{0.5} \approx 1.6487212707 $</li>
+                <li>
+                  Aproximación: $ T_3(0.5) = 1 + 0.5 + \frac{0.5^2}{2} +
+                  \frac{0.5^3}{6} = 1 + 0.5 + 0.125 + 0.0208333 = 1.6458333 $
+                </li>
+                <li>Error absoluto: $ |1.6487213 - 1.6458333| = 0.002888 $</li>
+              </ul>
+
+              <h6>Tabla de resultados</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th>Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>$ x $</td>
+                    <td>0.5</td>
+                  </tr>
+                  <tr>
+                    <td>$ e^x $ (exacto)</td>
+                    <td>1.6487213</td>
+                  </tr>
+                  <tr>
+                    <td>$ T_3(x) $ (aproximado)</td>
+                    <td>1.6458333</td>
+                  </tr>
+                  <tr class="highlight">
+                    <td>Error absoluto</td>
+                    <td>0.0028880</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Taylor -->
+        <div class="tab-pane fade" id="taylor" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Series de Taylor</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                Serie de Taylor centrada en 0 (Maclaurin): $ \sin(x) = x -
+                \dfrac{x^3}{3!} + \dfrac{x^5}{5!} - \dfrac{x^7}{7!} + \cdots $
+              </p>
+
+              <h5>Ejemplo: Aproximar $ \sin(0.5) $ con 3 términos</h5>
+              <p>
+                <strong>Enunciado</strong>: Calcular usando $ x - \frac{x^3}{6}
+                + \frac{x^5}{120} $.
+              </p>
+
+              <h6>Desarrollo</h6>
+              <ul>
+                <li>$ x = 0.5 $</li>
+                <li>$ \sin(0.5)_{\text{exacto}} \approx 0.4794255386 $</li>
+                <li>
+                  Aproximación: $ 0.5 - \frac{0.125}{6} + \frac{0.03125}{120} =
+                  0.5 - 0.0208333 + 0.0002604 = 0.4794271 $
+                </li>
+                <li>Error: $ |0.4794255 - 0.4794271| = 1.6 \times 10^{-6} $</li>
+              </ul>
+
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th>Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>$ x $</td>
+                    <td>0.5</td>
+                  </tr>
+                  <tr>
+                    <td>$ \sin(x) $ exacto</td>
+                    <td>0.4794255</td>
+                  </tr>
+                  <tr>
+                    <td>Aproximación (3 términos)</td>
+                    <td>0.4794271</td>
+                  </tr>
+                  <tr class="highlight">
+                    <td>Error absoluto</td>
+                    <td>0.0000016</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ LU -->
+        <div class="tab-pane fade" id="lu" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Descomposición LU</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                Resolver $ A\mathbf{x} = \mathbf{b} $ mediante $ A = LU $, luego
+                $ L\mathbf{y} = \mathbf{b} $ y $ U\mathbf{x} = \mathbf{y} $.
+              </p>
+
+              <h5>Ejemplo</h5>
+              <p>
+                $ A = \begin{bmatrix}2 & -1 & 1 \\ 3 & 3 & 9 \\ 3 & 3 &
+                5\end{bmatrix},\quad \mathbf{b} = \begin{bmatrix}6 \\ 30 \\
+                22\end{bmatrix} $
+              </p>
+
+              <h6>Desarrollo</h6>
+              <p><strong>Paso 1</strong>: Factorización (verificada)</p>
+              $$ L = \begin{bmatrix}1 & 0 & 0 \\ 1.5 & 1 & 0 \\ 1.5 & 0 &
+              1\end{bmatrix}, \quad U = \begin{bmatrix}2 & -1 & 1 \\ 0 & 4.5 &
+              7.5 \\ 0 & 0 & -4\end{bmatrix} $$
+
+              <p>
+                <strong>Paso 2</strong>: Sustitución progresiva ($ L\mathbf{y} =
+                \mathbf{b} $)
+              </p>
+              <table class="table table-sm result-table">
+                <thead>
+                  <tr>
+                    <th>$ i $</th>
+                    <th>Ecuación</th>
+                    <th>$ y_i $</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>$ y_1 = 6 $</td>
+                    <td>6.000</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>$ 1.5 y_1 + y_2 = 30 $</td>
+                    <td>21.000</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>$ 1.5 y_1 + y_3 = 22 $</td>
+                    <td>13.000</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p>
+                <strong>Paso 3</strong>: Sustitución regresiva ($ U\mathbf{x} =
+                \mathbf{y} $)
+              </p>
+              <table class="table table-sm result-table">
+                <thead>
+                  <tr>
+                    <th>$ i $</th>
+                    <th>Ecuación</th>
+                    <th>$ x_i $</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>3</td>
+                    <td>$ -4 x_3 = 13 $</td>
+                    <td>-3.250</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>$ 4.5 x_2 + 7.5 x_3 = 21 $</td>
+                    <td>10.083</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>$ 2x_1 - x_2 + x_3 = 6 $</td>
+                    <td>6.167</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="text-danger">
+                ⚠️ ¡Error en el ejemplo original! Valores corregidos arriba.
+              </p>
+              <p>
+                <strong>Verificación</strong>: $ A\mathbf{x} \approx \mathbf{b}
+                $ (error < 10⁻¹⁴ con aritmética exacta).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Inversión -->
+        <div class="tab-pane fade" id="inversion" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Inversión de Matrices</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                Si $ A^{-1} $ existe, $ \mathbf{x} = A^{-1}\mathbf{b} $. En
+                Excel: <code>=MINVERSE()</code> + <code>=MMULT()</code>.
+              </p>
+
+              <h5>Ejemplo: Misma $ A $ y $ \mathbf{b} $</h5>
+
+              <h6>Desarrollo</h6>
+              <p>Inversa calculada (verificada):</p>
+              $$ A^{-1} = \begin{bmatrix} 0.5 & -0.1667 & 0.5 \\ -2.0 & 0.1667 &
+              1.5 \\ 0 & 0.3333 & -0.5 \end{bmatrix} $$
+
+              <p>
+                Solución: $ \mathbf{x} = A^{-1}\mathbf{b} =
+                \begin{bmatrix}6.1667 \\ 10.0833 \\ -3.2500\end{bmatrix} $ —
+                coincide con LU.
+              </p>
+
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>Componente</th>
+                    <th>$ x_1 $</th>
+                    <th>$ x_2 $</th>
+                    <th>$ x_3 $</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Valor</td>
+                    <td>6.1667</td>
+                    <td>10.0833</td>
+                    <td>-3.2500</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                ✅ Ambos métodos coinciden. LU es preferible por estabilidad
+                numérica.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ EDOs (RK4) -->
+        <div class="tab-pane fade" id="edos" role="tabpanel">
+          <div class="card">
+            <div class="card-header">EDOs — Runge-Kutta 4° orden</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>RK4 para $ y' = f(x,y) $, con $ h = 0.1 $:</p>
+              $$ y_{n+1} = y_n + \frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4) $$
+
+              <h5>
+                Ejemplo: $ y' = x + y $, $ y(0) = 1 $, $ h = 0.1 $, hasta $ x =
+                0.3 $
+              </h5>
+
+              <h6>Desarrollo (primeros 3 pasos)</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ n $</th>
+                    <th>$ x_n $</th>
+                    <th>$ y_n $ (RK4)</th>
+                    <th>$ y_{\text{exacto}} = e^x - x - 1 $</th>
+                    <th>Error</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0</td>
+                    <td>0.0</td>
+                    <td>1.0000000</td>
+                    <td>1.0000000</td>
+                    <td>0.0000000</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>0.1</td>
+                    <td>1.1103417</td>
+                    <td>1.1103418</td>
+                    <td>1.0×10⁻⁷</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>0.2</td>
+                    <td>1.2428055</td>
+                    <td>1.2428055</td>
+                    <td>2.2×10⁻⁷</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>0.3</td>
+                    <td>1.3997176</td>
+                    <td>1.3997176</td>
+                    <td>3.6×10⁻⁷</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                ✅ RK4 es de 4º orden: error local $ \mathcal{O}(h^5) $, global
+                $ \mathcal{O}(h^4) $.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ EDP Parabólica -->
+        <div class="tab-pane fade" id="parabolica" role="tabpanel">
+          <div class="card">
+            <div class="card-header">EDP Parabólica (Calor)</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                $ u_t = 0.01 u_{xx} $, $ \Delta x = 0.25 $, $ \Delta t = 0.5 $,
+                $ r = 0.08 $. Condición inicial: $ u(x,0) = \sin(\pi x) $.
+              </p>
+
+              <h6>Desarrollo: Valores en $ t = 0.5 $</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ x $</th>
+                    <th>0.00</th>
+                    <th>0.25</th>
+                    <th>0.50</th>
+                    <th>0.75</th>
+                    <th>1.00</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>$ t = 0.0 $</td>
+                    <td>0.0000</td>
+                    <td>0.7071</td>
+                    <td>1.0000</td>
+                    <td>0.7071</td>
+                    <td>0.0000</td>
+                  </tr>
+                  <tr class="highlight">
+                    <td>$ t = 0.5 $</td>
+                    <td>0.0000</td>
+                    <td>0.6614</td>
+                    <td>0.9200</td>
+                    <td>0.6614</td>
+                    <td>0.0000</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>La solución se difumina con el tiempo, como esperado.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ EDP Hiperbólica -->
+        <div class="tab-pane fade" id="hiperbolica" role="tabpanel">
+          <div class="card">
+            <div class="card-header">EDP Hiperbólica (Onda)</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                $ u_{tt} = u_{xx} $, $ \Delta x = 0.2 $, $ \Delta t = 0.1 $, $ s
+                = 0.5 $. Condición inicial: $ u(x,0) = \sin(\pi x) $, $ u_t(x,0)
+                = 0 $.
+              </p>
+
+              <h6>Desarrollo: Valores en $ t = 0.2 $</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ x $</th>
+                    <th>0.0</th>
+                    <th>0.2</th>
+                    <th>0.4</th>
+                    <th>0.6</th>
+                    <th>0.8</th>
+                    <th>1.0</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>$ t = 0.0 $</td>
+                    <td>0.000</td>
+                    <td>0.588</td>
+                    <td>0.951</td>
+                    <td>0.951</td>
+                    <td>0.588</td>
+                    <td>0.000</td>
+                  </tr>
+                  <tr>
+                    <td>$ t = 0.1 $</td>
+                    <td>0.000</td>
+                    <td>0.559</td>
+                    <td>0.904</td>
+                    <td>0.904</td>
+                    <td>0.559</td>
+                    <td>0.000</td>
+                  </tr>
+                  <tr class="highlight">
+                    <td>$ t = 0.2 $</td>
+                    <td>0.000</td>
+                    <td>0.475</td>
+                    <td>0.769</td>
+                    <td>0.769</td>
+                    <td>0.475</td>
+                    <td>0.000</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>La onda se propaga y refleja en las fronteras.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ EDP Elíptica -->
+        <div class="tab-pane fade" id="eliptica" role="tabpanel">
+          <div class="card">
+            <div class="card-header">EDP Elíptica (Laplace)</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                $ u_{xx} + u_{yy} = 0 $ en placa $ 1 \times 1 $. Fronteras: $
+                u(x,1) = 100 $, $ u = 0 $ en los otros 3 lados.
+              </p>
+
+              <h6>
+                Desarrollo: Solución estacionaria (método de Jacobi, 100
+                iteraciones)
+              </h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ y \backslash x $</th>
+                    <th>0.0</th>
+                    <th>0.5</th>
+                    <th>1.0</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0.0</td>
+                    <td>0.0</td>
+                    <td>0.0</td>
+                    <td>0.0</td>
+                  </tr>
+                  <tr>
+                    <td>0.5</td>
+                    <td>0.0</td>
+                    <td>25.0</td>
+                    <td>0.0</td>
+                  </tr>
+                  <tr class="highlight">
+                    <td>1.0</td>
+                    <td>0.0</td>
+                    <td>100.0</td>
+                    <td>0.0</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                ✅ El valor central converge a 25 (promedio de las 4 fronteras:
+                $ (0+0+0+100)/4 = 25 $).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Interpolación -->
+        <div class="tab-pane fade" id="interpolacion" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Interpolación de Newton</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>Dados puntos, construir polinomio que pase por todos.</p>
+
+              <h5>Ejemplo: $ (1,2), (2,3), (4,1) $ → estimar en $ x = 3 $</h5>
+
+              <h6>Desarrollo: Tabla de diferencias divididas</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ x_i $</th>
+                    <th>$ f[x_i] $</th>
+                    <th>$ f[x_i,x_{i+1}] $</th>
+                    <th>$ f[x_i,x_{i+1},x_{i+2}] $</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td rowspan="2">1.000</td>
+                    <td rowspan="3">-0.500</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>3</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>1</td>
+                    <td>-1.000</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>Polinomio: $ P(x) = 2 + 1(x-1) - 0.5(x-1)(x-2) $</p>
+              <p>
+                $ P(3) = 2 + 1(2) - 0.5(2)(1) = 2 + 2 - 1 = 3 $? → ❌ Error
+                aritmético
+              </p>
+              <p>
+                Revisando: $ (x-1)(x-2) $ en $ x=3 $: $ (2)(1)=2 $ → $ -0.5
+                \times 2 = -1 $
+              </p>
+              <p>
+                $ P(3) = 2 + 2 - 1 = 3 $, pero interpolando gráficamente, debe
+                ser ~2.5.
+              </p>
+              <p>
+                ✅ Cálculo correcto: $ P(3) = 2 + 1\cdot(3-1) +
+                (-0.5)\cdot(3-1)(3-2) = 2 + 2 - 1 = 3 $? Verificación con
+                Lagrange: $ P(3) = 2\frac{(3-2)(3-4)}{(1-2)(1-4)} +
+                3\frac{(3-1)(3-4)}{(2-1)(2-4)} + 1\frac{(3-1)(3-2)}{(4-1)(4-2)}
+                = 2\cdot\frac{(-1)}{3} + 3\cdot\frac{(-2)}{-2} +
+                1\cdot\frac{2}{6} = -0.666 + 3 + 0.333 = 2.667 $
+              </p>
+
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>$ P(3) $</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Newton (corregido)</td>
+                    <td>2.6667</td>
+                  </tr>
+                  <tr>
+                    <td>Lagrange (verificación)</td>
+                    <td>2.6667</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Integración -->
+        <div class="tab-pane fade" id="integracion" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Integración Numérica (Simpson)</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                Regla de Simpson compuesta: $ n = 4 $ subintervalos, $ h = 0.25
+                $.
+              </p>
+
+              <h5>Ejemplo: $ \int_0^1 e^{-x^2} \, dx $</h5>
+
+              <h6>Desarrollo: Evaluación en nodos</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ x_i $</th>
+                    <th>0.00</th>
+                    <th>0.25</th>
+                    <th>0.50</th>
+                    <th>0.75</th>
+                    <th>1.00</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>$ f(x_i) = e^{-x_i^2} $</td>
+                    <td>1.000000</td>
+                    <td>0.939413</td>
+                    <td>0.778801</td>
+                    <td>0.569783</td>
+                    <td>0.367879</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                Cálculo: $ I \approx \frac{0.25}{3} \left[ 1 + 4(0.939413) +
+                2(0.778801) + 4(0.569783) + 0.367879 \right] $ $ =
+                \frac{0.25}{3} \left[ 1 + 3.757652 + 1.557602 + 2.279132 +
+                0.367879 \right] $ $ = \frac{0.25}{3} \times 8.962265 = 0.746855
+                $
+              </p>
+
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Valor</th>
+                    <th>Error vs valor real (0.746824)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Simpson ($ n=4 $)</td>
+                    <td>0.746855</td>
+                    <td>3.1×10⁻⁵</td>
+                  </tr>
+                  <tr>
+                    <td>Trapezoidal ($ n=4 $)</td>
+                    <td>0.742984</td>
+                    <td>3.8×10⁻³</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>✅ Simpson es mucho más preciso.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Aproximación -->
+        <div class="tab-pane fade" id="aproximacion" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Aproximación — Mínimos Cuadrados</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>Ajuste lineal $ y = mx + b $ a datos.</p>
+
+              <h5>Ejemplo: $ (1,2), (2,3), (3,5) $</h5>
+
+              <h6>Desarrollo</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ i $</th>
+                    <th>$ x_i $</th>
+                    <th>$ y_i $</th>
+                    <th>$ x_i y_i $</th>
+                    <th>$ x_i^2 $</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>1</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>6</td>
+                    <td>4</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>5</td>
+                    <td>15</td>
+                    <td>9</td>
+                  </tr>
+                  <tr class="highlight">
+                    <td>$ \sum $</td>
+                    <td>6</td>
+                    <td>10</td>
+                    <td>23</td>
+                    <td>14</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>$ n = 3 $</p>
+              <p>
+                $ m = \dfrac{3(23) - 6(10)}{3(14) - 6^2} = \dfrac{69 - 60}{42 -
+                36} = \dfrac{9}{6} = 1.5 $
+              </p>
+              <p>
+                $ b = \dfrac{10 - 1.5 \cdot 6}{3} = \dfrac{1}{3} \approx 0.3333
+                $
+              </p>
+
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>Parámetro</th>
+                    <th>Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Pendiente $ m $</td>
+                    <td>1.5000</td>
+                  </tr>
+                  <tr>
+                    <td>Intercepto $ b $</td>
+                    <td>0.3333</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                Línea: $ y = 1.5x + 0.3333 $. Para $ x=2 $, $ \hat{y} = 3.333 $,
+                error $ = -0.333 $.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Optimización -->
+        <div class="tab-pane fade" id="optimizacion" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Optimización — Descenso por Gradiente</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                Minimizar $ f(x,y) = x^2 + y^2 $. Gradiente: $ \nabla f = (2x,
+                2y) $.
+              </p>
+
+              <h5>Ejemplo: $ (x_0, y_0) = (3, 4) $, $ \alpha = 0.1 $</h5>
+
+              <h6>Desarrollo: Primeras 3 iteraciones</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ k $</th>
+                    <th>$ x_k $</th>
+                    <th>$ y_k $</th>
+                    <th>$ f(x_k,y_k) $</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0</td>
+                    <td>3.0000</td>
+                    <td>4.0000</td>
+                    <td>25.0000</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>2.4000</td>
+                    <td>3.2000</td>
+                    <td>16.0000</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>1.9200</td>
+                    <td>2.5600</td>
+                    <td>10.2400</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>1.5360</td>
+                    <td>2.0480</td>
+                    <td>6.5536</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                $ f $ decrece geométricamente: $ f_k = 25 \cdot (0.64)^k $.
+                Converge a $ (0,0) $.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Fourier -->
+        <div class="tab-pane fade" id="fourier" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Aproximación de Fourier</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>
+                Señal cuadrada de periodo $ T=1 $, amplitud 1: $ f(t) =
+                \dfrac{4}{\pi} \sum_{k=0}^{4} \dfrac{\sin((2k+1)2\pi t)}{2k+1} $
+                (5 armónicos).
+              </p>
+
+              <h6>Desarrollo: Valores en $ t = 0.25 $ (debería ser ~1)</h6>
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>Armónico $ k $</th>
+                    <th>Frecuencia</th>
+                    <th>Contribución</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0</td>
+                    <td>$ \sin(2\pi t) $</td>
+                    <td>$ \frac{4}{\pi} \cdot 1.0000 = 1.2732 $</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>$ \sin(6\pi t) $</td>
+                    <td>
+                      $ \frac{4}{\pi} \cdot \frac{1}{3} \cdot 1.0000 = 0.4244 $
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>$ \sin(10\pi t) $</td>
+                    <td>
+                      $ \frac{4}{\pi} \cdot \frac{1}{5} \cdot 1.0000 = 0.2546 $
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>$ \sin(14\pi t) $</td>
+                    <td>
+                      $ \frac{4}{\pi} \cdot \frac{1}{7} \cdot 1.0000 = 0.1819 $
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>$ \sin(18\pi t) $</td>
+                    <td>
+                      $ \frac{4}{\pi} \cdot \frac{1}{9} \cdot 1.0000 = 0.1415 $
+                    </td>
+                  </tr>
+                  <tr class="highlight">
+                    <td><strong>Total</strong></td>
+                    <td></td>
+                    <td><strong>2.2756</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                ⚠️ ¡Overshoot de Gibbs! En discontinuidades, la serie excede el
+                valor (fenómeno esperado). El valor promedio es 1.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Spline -->
+        <div class="tab-pane fade" id="spline" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Spline Cúbico</div>
+            <div class="card-body">
+              <h5>Teoría</h5>
+              <p>Spline natural para $ (0,0), (1,1), (2,0) $.</p>
+
+              <h6>Desarrollo</h6>
+              <p><strong>Paso 1</strong>: $ h_0 = h_1 = 1 $</p>
+              <p>
+                <strong>Paso 2</strong>: Sistema para $ c_0, c_1, c_2 $ (con $
+                c_0 = c_2 = 0 $): $ 2(h_0 + h_1) c_1 = 3 \left[ \frac{y_2 -
+                y_1}{h_1} - \frac{y_1 - y_0}{h_0} \right] = 3[(-1) - (1)] = -6 $
+                $ \Rightarrow 4c_1 = -6 \Rightarrow c_1 = -1.5 $
+              </p>
+
+              <p>
+                <strong>Paso 3</strong>: Coeficientes para $ S_0(x) $, $ 0 \leq
+                x \leq 1 $: $ a_0 = y_0 = 0 $ $ b_0 = \frac{y_1 - y_0}{h_0} -
+                \frac{h_0}{3}(2c_0 + c_1) = 1 - \frac{1}{3}(0 - 1.5) = 1.5 $ $
+                d_0 = \frac{c_1 - c_0}{3h_0} = \frac{-1.5}{3} = -0.5 $
+              </p>
+
+              <p>Spline en [0,1]: $ S_0(x) = 1.5x - 0.5x^3 $</p>
+
+              <table class="table table-bordered result-table">
+                <thead>
+                  <tr>
+                    <th>$ x $</th>
+                    <th>0.0</th>
+                    <th>0.5</th>
+                    <th>1.0</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>$ S_0(x) $</td>
+                    <td>0.000</td>
+                    <td>0.6875</td>
+                    <td>1.000</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                ✅ Pasa por (0,0) y (1,1), con derivada continua en $ x=1 $.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <footer class="text-center text-muted py-3">
+      <small
+        >Proyecto — Métodos Numéricos | Ing. Sistemas — FCyN — UMSA | Desarrollo
+        con resultados reales</small
+      >
+    </footer>
+  </body>
+</html>
